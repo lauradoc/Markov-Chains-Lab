@@ -1,8 +1,6 @@
 """Generate Markov text from text files."""
 import sys
 
-
-
 import random
 
 from random import choice
@@ -18,7 +16,7 @@ def open_and_read_file(file_path):
     return open(file_path).read()
 
 
-def make_chains(text_string):
+def make_chains(text_string, n):
     """Take input text as string; return dictionary of Markov chains.
 
     A chain will be a key that consists of a tuple of (word1, word2)
@@ -47,14 +45,15 @@ def make_chains(text_string):
 
     words = text_string.split()
 
-    for i in range(len(words) - 2):
-        word_tuple = (words[i], words[i+1])
-        word_add = words[i + 2]
+    for i in range(len(words) - n):
+        n_gram = words[i:n+i]
+        n_gram_tuple = tuple(n_gram)
+        word_add = words[n+i:n+i+1]
 
-        if word_tuple not in chains:
-            chains[word_tuple] = []
+        if n_gram_tuple not in chains:
+            chains[n_gram_tuple] = []
 
-        chains[word_tuple].append(word_add)
+        chains[n_gram_tuple].append(word_add)
 
     return chains
 
@@ -78,18 +77,19 @@ def make_text(chains):
 
     for key, word in chains.items():
         words.append(random.choice(word))
-    
+
+    print(words)
 
     return " ".join(words)
 
-
 input_path = sys.argv[1]
+n = sys.argv[2]
 
 # Open the file and turn it into one long string
 input_text = open_and_read_file(input_path)
 
 # Get a Markov chain
-chains = make_chains(input_text)
+chains = make_chains(input_text, int(n))
 
 # Produce random text
 random_text = make_text(chains)
